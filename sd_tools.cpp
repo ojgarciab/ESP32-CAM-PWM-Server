@@ -27,6 +27,22 @@ void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
       Serial.print("  SIZE: ");
       Serial.println(file.size());
     }
+    file.close();
     file = root.openNextFile();
   }
+  root.close();
+}
+
+char * readFile(fs::FS &fs, const char * path){
+  File file = fs.open(path);
+  if(!file){
+    return NULL;
+  }
+
+  unsigned long fileSize = file.size();
+  char * data = (char *)malloc(fileSize + 1);
+  file.read((uint8_t*)data, fileSize);
+  data[fileSize] = 0;
+  file.close();
+  return data;
 }

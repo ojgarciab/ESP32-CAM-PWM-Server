@@ -39,8 +39,10 @@
 #warning "[INFO] SD card support enabled"
 
 #include "sd_tools.h"
-char* ssid = NULL;
-char* password = NULL;
+char ssid[33]; // 32 (max ssid length) + 1
+char* password = NULL; // 63 (max password length) + 1
+char* basePath = "/ESP32/WiFi";
+char fileName[11 + 1 + 32 + 4 + 1]; // strlen(basePath) + strlen("/") + 32 (max ssid length) + strlen(".txt") + 1
 
 #else
 #warning "[INFO] SD card support disabled"
@@ -172,11 +174,12 @@ void setup() {
   Serial.printf("Total file system space: %lluMB\n", SD_MMC.totalBytes() / (1024 * 1024));
   Serial.printf("Used file system space: %lluMB\n", SD_MMC.usedBytes() / (1024 * 1024));
 
-  listDir(SD_MMC, "/ESP32/WiFi", 0);
+  listDir(SD_MMC, basePath, 0);
 
   // Start scanning WiFi networks
 
   Serial.println("Scan start");
+  int selected = -1;
 
   // WiFi.scanNetworks will return the number of networks found.
   int n = WiFi.scanNetworks();
@@ -188,10 +191,11 @@ void setup() {
     Serial.println(" networks found");
     Serial.println("Nr | SSID                             | RSSI | CH | Encryption");
     for (int i = 0; i < n; ++i) {
+      WiFi.SSID(i).toCharArray(ssid, sizeof(ssid));
       // Print SSID and RSSI for each network found
       Serial.printf("%2d",i + 1);
       Serial.print(" | ");
-      Serial.printf("%-32.32s", WiFi.SSID(i).c_str());
+      Serial.printf("%-32.32s", ssid);
       Serial.print(" | ");
       Serial.printf("%4d", WiFi.RSSI(i));
       Serial.print(" | ");
@@ -229,6 +233,17 @@ void setup() {
       default:
         Serial.print("unknown");
       }
+      if (selected == -1){
+        sprintf(fileName, "%s/%s.txt", basePath, ssid);
+        password = readFile(SD_MMC, fileName);
+        if (password != NULL) {
+          selected = i;
+          Serial.print(" <---");
+          WiFi.begin(ssid, password);
+          WiFi.setSleep(false);
+          free(password);
+        }
+      }
       Serial.println();
       delay(10);
     }
@@ -236,6 +251,10 @@ void setup() {
 
     // Delete the scan result to free memory for code below.
     WiFi.scanDelete();
+  }
+  if (selected == -1 ){
+    Serial.println("No WiFi selected.");
+    return;
   }
 #else
   Serial.println("Using hardcoded WiFi and credentials");
