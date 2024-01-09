@@ -32,7 +32,7 @@
 //#define CAMERA_MODEL_DFRobot_Romeo_ESP32S3 // Has PSRAM
 #include "camera_pins.h"
 
-// Select whether to use the SD card
+// Select whether to use the SD (MMC) card
 #define _USE_SD
 
 #if defined(_USE_SD)
@@ -146,11 +146,11 @@ void setup() {
 #endif
 
 #if defined(_USE_SD)
-  if(!SD.begin()){
+  if(!SD_MMC.begin()){
     Serial.println("Card Mount Failed");
     return;
   }
-  uint8_t cardType = SD.cardType();
+  uint8_t cardType = SD_MMC.cardType();
 
   if(cardType == CARD_NONE){
     Serial.println("No SD card attached");
@@ -168,11 +168,11 @@ void setup() {
       Serial.println("UNKNOWN");
   }
 
-  Serial.printf("SD Card Size: %lluMB\n", SD.cardSize() / (1024 * 1024));
-  Serial.printf("Total file system space: %lluMB\n", SD.totalBytes() / (1024 * 1024));
-  Serial.printf("Used file system space: %lluMB\n", SD.usedBytes() / (1024 * 1024));
+  Serial.printf("SD Card Size: %lluMB\n", SD_MMC.cardSize() / (1024 * 1024));
+  Serial.printf("Total file system space: %lluMB\n", SD_MMC.totalBytes() / (1024 * 1024));
+  Serial.printf("Used file system space: %lluMB\n", SD_MMC.usedBytes() / (1024 * 1024));
 
-  listDir(SD, "/ESP32/WiFi", 0);
+  listDir(SD_MMC, "/ESP32/WiFi", 0);
 
   // Start scanning WiFi networks
 
