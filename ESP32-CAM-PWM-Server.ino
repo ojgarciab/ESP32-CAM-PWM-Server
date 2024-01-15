@@ -256,15 +256,22 @@ void setup() {
     Serial.println("No WiFi selected.");
     return;
   }
+  /* We terminate the use of the SD card */
+  SD_MMC.end();
 #else
   Serial.println("Using hardcoded WiFi and credentials");
   WiFi.begin(ssid, password);
   WiFi.setSleep(false);
 #endif
 
+  /* Debug the WiFi connection by flashing the red LED quickly */
+  pinMode(33, OUTPUT);
   Serial.println("Connecting to the WiFi network");
   while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
+    digitalWrite(33, LOW);
+    delay(50);
+    digitalWrite(33, HIGH);
+    delay(450);
     Serial.print(".");
   }
   Serial.println("");
@@ -278,6 +285,9 @@ void setup() {
 }
 
 void loop() {
-  // Do nothing. Everything is done in another task by the web server
-  delay(10000);
+  /* Debug the activity of the main loop by flashing the red LED slowly */
+  digitalWrite(33, LOW);
+  delay(50);
+  digitalWrite(33, HIGH);
+  delay(950);
 }
