@@ -54,11 +54,11 @@
 char ssid[33]; // 32 (max ssid length) + 1
 char* password = NULL; // 63 (max password length) + 1
 #if defined(_FS_WIFI_PATH)
-char* basePath = _FS_WIFI_PATH;
+char basePath[] = _FS_WIFI_PATH;
 #else
-char* basePath = "/";
+char basePath[] = "/";
 #endif
-char fileName[11 + 1 + 32 + 4 + 1]; // strlen(basePath) + strlen("/") + 32 (max ssid length) + strlen(".txt") + 1
+char fileName[sizeof(basePath) + 1 + 32 + 4 + 1]; // strlen(basePath) + strlen("/") + 32 (max ssid length) + strlen(".txt") + 1
 
 #else
 #warning "[INFO] SD/SD_MMC card support disabled"
@@ -164,11 +164,11 @@ void setup() {
 #endif
 
 #if defined(_USE_SD)
-  if(!SD_MMC.begin()){
+  if(!_FS.begin()){
     Serial.println("Card Mount Failed");
     return;
   }
-  uint8_t cardType = SD_MMC.cardType();
+  uint8_t cardType = _FS.cardType();
 
   if(cardType == CARD_NONE){
     Serial.println("No SD card attached");
@@ -186,11 +186,11 @@ void setup() {
       Serial.println("UNKNOWN");
   }
 
-  Serial.printf("SD Card Size: %lluMB\n", SD_MMC.cardSize() / (1024 * 1024));
-  Serial.printf("Total file system space: %lluMB\n", SD_MMC.totalBytes() / (1024 * 1024));
-  Serial.printf("Used file system space: %lluMB\n", SD_MMC.usedBytes() / (1024 * 1024));
+  Serial.printf("Card Size: %lluMB\n", _FS.cardSize() / (1024 * 1024));
+  Serial.printf("Total file system space: %lluMB\n", _FS.totalBytes() / (1024 * 1024));
+  Serial.printf("Used file system space: %lluMB\n", _FS.usedBytes() / (1024 * 1024));
 
-  listDir(SD_MMC, basePath, 0);
+  listDir(_FS, basePath, 0);
 
   // Start scanning WiFi networks
 
@@ -251,7 +251,7 @@ void setup() {
       }
       if (selected == -1){
         sprintf(fileName, "%s/%s.txt", basePath, ssid);
-        password = readFile(SD_MMC, fileName);
+        password = readFile(_FS, fileName);
         if (password != NULL) {
           selected = i;
           Serial.print(" <---");
@@ -273,7 +273,7 @@ void setup() {
     return;
   }
   /* We terminate the use of the SD card */
-  SD_MMC.end();
+  _FS.end();
 #else
   Serial.println("Using hardcoded WiFi and credentials");
   WiFi.begin(ssid, password);

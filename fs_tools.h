@@ -7,8 +7,10 @@
 // Use SD or SD_MMC
 #if defined(_USE_SD)
 #include "SD.h"
+#define _FS SD
 #else
 #include "SD_MMC.h"
+#define _FS SD_MMC
 #endif
 
 #include "SPI.h"
