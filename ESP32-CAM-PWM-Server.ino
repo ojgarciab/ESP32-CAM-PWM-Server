@@ -8,6 +8,7 @@
 // Select whether to use the SD (SD or SD_MMC) card
 //#define _USE_SD
 #define _USE_SD_MMC
+#define _FS_WIFI_PATH "/ESP32/WiFi"
 
 //
 // WARNING!!! PSRAM IC required for UXGA resolution and high JPEG quality
@@ -46,17 +47,21 @@
 
 #include "camera_pins.h"
 
-#if defined(_USE_SD)
-#warning "[INFO] SD card support enabled"
+#if defined(_USE_SD) or defined(_USE_SD_MMC)
+#warning "[INFO] SD/SD_MMC card support enabled"
 
-#include "sd_tools.h"
+#include "fs_tools.h"
 char ssid[33]; // 32 (max ssid length) + 1
 char* password = NULL; // 63 (max password length) + 1
-char* basePath = "/ESP32/WiFi";
+#if defined(_FS_WIFI_PATH)
+char* basePath = _FS_WIFI_PATH;
+#else
+char* basePath = "/";
+#endif
 char fileName[11 + 1 + 32 + 4 + 1]; // strlen(basePath) + strlen("/") + 32 (max ssid length) + strlen(".txt") + 1
 
 #else
-#warning "[INFO] SD card support disabled"
+#warning "[INFO] SD/SD_MMC card support disabled"
 // ===========================
 // Enter your WiFi credentials
 // ===========================
