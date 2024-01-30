@@ -1,3 +1,6 @@
+// Avoid compiling the code if it is not going to be used
+#if defined(_USE_SD) or defined(_USE_SD_MMC)
+
 #include "sd_tools.h"
 
 void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
@@ -46,3 +49,4 @@ char * readFile(fs::FS &fs, const char * path){
   file.close();
   return data;
 }
+#endif

@@ -1,6 +1,14 @@
 #include "esp_camera.h"
 #include <WiFi.h>
 
+// #################################
+// # START OF GLOBAL CONFIGURATION
+// #
+
+// Select whether to use the SD (SD or SD_MMC) card
+//#define _USE_SD
+#define _USE_SD_MMC
+
 //
 // WARNING!!! PSRAM IC required for UXGA resolution and high JPEG quality
 //            Ensure ESP32 Wrover Module or other board with PSRAM is selected
@@ -30,10 +38,13 @@
 //#define CAMERA_MODEL_ESP32S3_CAM_LCD
 //#define CAMERA_MODEL_DFRobot_FireBeetle2_ESP32S3 // Has PSRAM
 //#define CAMERA_MODEL_DFRobot_Romeo_ESP32S3 // Has PSRAM
-#include "camera_pins.h"
 
-// Select whether to use the SD (MMC) card
-#define _USE_SD
+// #
+// # END OF GLOBAL CONFIGURATION
+// ###############################
+
+
+#include "camera_pins.h"
 
 #if defined(_USE_SD)
 #warning "[INFO] SD card support enabled"
